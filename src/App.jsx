@@ -1,6 +1,6 @@
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import GymTraining from "./components/GymTraining";
+import Home from "../pages/home";
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
@@ -16,7 +16,7 @@ if ("serviceWorker" in navigator) {
 function App() {
   return (
     <>
-      <GymTraining />
+      <Home />
     </>
   );
 }

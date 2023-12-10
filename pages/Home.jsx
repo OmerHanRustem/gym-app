@@ -6,17 +6,34 @@ import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import Table from "react-bootstrap/Table";
 import { FormSelect } from "react-bootstrap";
+import { EditModal } from "../src/components/Modal";
+import { TrainingForm } from "../src/components/TrainingForm";
+import { TrainingsTable } from "../src/components/TrainingsTable";
 
-const GymTraining = () => {
+const Home = () => {
   const [trainings, setTrainings] = useState([]);
   const todayDate = new Date().toISOString().split("T")[0];
   const [date, setDate] = useState(todayDate);
+
+  // Add form state
   const [machine, setMachine] = useState("");
   const [groups, setGroups] = useState(1);
+  const [times, setTimes] = useState(1);
   const [weight, setWeight] = useState(0);
   const [unit, setUnit] = useState("kg");
+
+  // Modal form state
+  const [modalMachine, setModalMachine] = useState("");
+  const [modalGroups, setModalGroups] = useState(1);
+  const [modalTimes, setModalTimes] = useState(1);
+  const [modalWeight, setModalWeight] = useState(0);
+  const [modalUnit, setModalUnit] = useState("kg");
+
+  const [importSection, setImportSection] = useState(false);
+
+  const [showModal, setShowModal] = useState(false);
+  const [editIndex, setEditIndex] = useState(null);
 
   const loadTrainings = async () => {
     const db = await openDB("gym-trainings", 1, {
@@ -46,19 +63,19 @@ const GymTraining = () => {
 
     if (existingTraining) {
       // Update existing training
-      existingTraining.trainings.push({ machine, weight, unit, groups });
+      existingTraining.trainings.push({ machine, weight, unit, groups, times });
       await store.put(existingTraining);
     } else {
       // Add a new training object under the same date
       const newTraining = {
         date,
-        trainings: [{ machine, weight, unit, groups }],
+        trainings: [{ machine, weight, unit, groups, times }],
       };
       await store.put(newTraining);
     }
 
     loadTrainings();
-    setDate("");
+    setDate(todayDate);
     setMachine("");
     setGroups(0);
     setWeight(0);
@@ -79,7 +96,7 @@ const GymTraining = () => {
         .map((training) => {
           return training.trainings
             .map((t) => {
-              return `${training.date},${t.machine},${t.weight},${t.unit},${t.groups}`;
+              return `${training.date},${t.machine},${t.weight},${t.unit},${t.groups},${t.times}`;
             })
             .join("\n");
         })
@@ -115,8 +132,8 @@ const GymTraining = () => {
       const dataMap = new Map();
 
       rows.forEach((row) => {
-        const [date, machine, weight, unit, groups] = row.split(",");
-        const training = { machine, weight, unit, groups };
+        const [date, machine, weight, unit, groups, times] = row.split(",");
+        const training = { machine, weight, unit, groups, times }; // Include "times" in the training object
 
         if (!dataMap.has(date)) {
           dataMap.set(date, [training]);
@@ -147,17 +164,57 @@ const GymTraining = () => {
     }
   };
 
-  const deleteTraining = async (date) => {
+  const editTrainingEntry = (date, index) => {
+    // Set the main form state with the values of the selected training
+    setDate(date);
+    setEditIndex(index);
+
+    // Set the modal form state with the values of the selected training
+    const selectedTraining = trainings.find((t) => t.date === date)?.trainings[
+      index
+    ];
+    if (selectedTraining) {
+      setModalMachine(selectedTraining.machine);
+      setModalWeight(selectedTraining.weight);
+      setModalUnit(selectedTraining.unit);
+      setModalGroups(selectedTraining.groups);
+      setModalTimes(selectedTraining.times);
+    }
+
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setEditIndex(null);
+  };
+
+  const handleSaveEdit = async () => {
+    // Retrieve the existing training using the date
     const db = await openDB("gym-trainings", 1);
     const transaction = db.transaction("trainings", "readwrite");
     const store = transaction.objectStore("trainings");
 
-    await store.delete(date);
+    const existingTraining = await store.get(date);
 
-    loadTrainings(); // Refresh the displayed data after deletion
+    if (existingTraining) {
+      // Update the training at the editIndex with the new values from the modal form
+      existingTraining.trainings[editIndex] = {
+        machine: modalMachine,
+        weight: modalWeight,
+        unit: modalUnit,
+        groups: modalGroups,
+        times: modalTimes,
+      };
+
+      // Put the updated training back into the store
+      await store.put(existingTraining);
+
+      // Close the modal and refresh the displayed data
+      handleCloseModal();
+      loadTrainings();
+    }
   };
-
-  const [importSection, setImportSection] = useState(false);
 
   return (
     <Container>
@@ -198,142 +255,58 @@ const GymTraining = () => {
       )}
 
       <Row className="justify-content-center align-items-center m-3">
-        <h2>Gym Trainings</h2>
+        <h2>Bunyan - Gym Trainings</h2>
 
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Machine</th>
-              <th>Weight</th>
-              <th>Groups</th>
-            </tr>
-          </thead>
-          <tbody>
-            {trainings.map((training) => (
-              <tr key={training.date}>
-                <td>{training.date}</td>
-                <td>
-                  {training.trainings.map((t, index) => (
-                    <React.Fragment key={index}>
-                      {t.machine}
-                      <br />
-                    </React.Fragment>
-                  ))}
-                </td>
-                <td>
-                  {training.trainings.map((t, index) => (
-                    <React.Fragment key={index}>
-                      {t.weight} {t.unit}
-                      <br />
-                    </React.Fragment>
-                  ))}
-                </td>
-                <td>
-                  {training.trainings.map((t, index) => (
-                    <React.Fragment key={index}>
-                      {t.groups}
-                      <br />
-                    </React.Fragment>
-                  ))}
-                </td>
-                <td>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => deleteTraining(training.date)}
-                  >
-                    Delete
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+        <TrainingsTable
+          trainings={trainings}
+          loadTraining={loadTrainings}
+          editTrainingEntry={editTrainingEntry}
+        />
 
-        <Form>
-          <Form.Group as={Row} className="mb-3">
-            <Form.Label htmlFor="date" column sm="1">
-              Date
-            </Form.Label>
-            <Col sm="4">
-              <Form.Control
-                id="date"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
-            </Col>
-          </Form.Group>
-
-          <Form.Group as={Row} className="mb-3">
-            <Form.Label htmlFor="machine" column sm="1">
-              Machine
-            </Form.Label>
-            <Col sm="4">
-              <Form.Control
-                id="machine"
-                type="text"
-                value={machine}
-                onChange={(e) => setMachine(e.target.value)}
-              />
-            </Col>
-          </Form.Group>
-
-          <Form.Group as={Row} className="mb-3">
-            <Form.Label htmlFor="weight" column sm="1">
-              Weight
-            </Form.Label>
-            <Col sm="2">
-              <Form.Control
-                id="weight"
-                type="number"
-                min={0}
-                value={weight}
-                onChange={(e) => setWeight(Number(e.target.value))}
-              />
-            </Col>
-            <Col sm="2">
-              <Form.Select
-                id="unit"
-                value={unit}
-                onChange={(e) => setUnit(e.target.value)}
-              >
-                <option value="kg">kg</option>
-                <option value="lb">lb</option>
-              </Form.Select>
-            </Col>
-          </Form.Group>
-
-          <Form.Group as={Row} className="mb-3">
-            <Form.Label htmlFor="groups" column sm="1">
-              Groups
-            </Form.Label>
-            <Col sm="4">
-              <Form.Control
-                id="groups"
-                type="number"
-                min={1}
-                value={groups}
-                onChange={(e) => setGroups(Number(e.target.value))}
-              />
-            </Col>
-          </Form.Group>
-        </Form>
-
-        <Button
-          className="mt-2 w-50"
-          variant={
-            !date || !machine || !groups || !weight ? "secondary" : "primary"
-          }
-          onClick={addTraining}
-          disabled={!date || !machine || !groups || !weight}
-        >
-          Add Training
-        </Button>
+        <TrainingForm
+          addTraining={addTraining}
+          date={date}
+          setDate={setDate}
+          machine={machine}
+          setMachine={setMachine}
+          groups={groups}
+          setGroups={setGroups}
+          times={times}
+          setTimes={setTimes}
+          weight={weight}
+          setWeight={setWeight}
+          unit={unit}
+          setUnit={setUnit}
+        />
       </Row>
+
+      <EditModal
+        showModal={showModal}
+        setShowModal={setShowModal}
+        handleSave={handleSaveEdit}
+        header="Edit Training"
+      >
+        <TrainingForm
+          date={date}
+          setDate={setDate}
+          addForm={false}
+          machine={modalMachine}
+          setMachine={setModalMachine}
+          groups={modalGroups}
+          setGroups={setModalGroups}
+          times={modalTimes}
+          setTimes={setModalTimes}
+          weight={modalWeight}
+          setWeight={setModalWeight}
+          unit={modalUnit}
+          setUnit={setModalUnit}
+          singleLabel="3"
+          singleControl="8"
+          multiControl="4"
+        />
+      </EditModal>
     </Container>
   );
 };
 
-export default GymTraining;
+export default Home;

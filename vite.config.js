@@ -13,7 +13,7 @@ export default defineConfig({
         short_name: "Gym App",
         theme_color: "#ffffff",
         background_color: "#ffffff",
-        start_url: "/",
+        start_url: "/gym-app/",
         display: "standalone",
         icons: [
           {
