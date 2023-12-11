@@ -4,6 +4,8 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 
+import { useTranslation } from "react-i18next";
+
 export const TrainingForm = ({
   date,
   setDate,
@@ -23,13 +25,14 @@ export const TrainingForm = ({
   singleControl = "4",
   multiControl = "2",
 }) => {
+  const { t, i18n } = useTranslation();
   return (
     <>
       <Form>
         {addForm && (
           <Form.Group as={Row} className="mb-3">
             <Form.Label htmlFor="date" column sm={singleLabel}>
-              Date
+              {t("date")}
             </Form.Label>
             <Col sm={singleControl}>
               <Form.Control
@@ -44,7 +47,7 @@ export const TrainingForm = ({
 
         <Form.Group as={Row} className="mb-3">
           <Form.Label htmlFor="machine" column sm={singleLabel}>
-            Machine
+            {t("machine")}
           </Form.Label>
           <Col sm={singleControl}>
             <Form.Control
@@ -58,13 +61,12 @@ export const TrainingForm = ({
 
         <Form.Group as={Row} className="mb-3">
           <Form.Label htmlFor="weight" column sm={singleLabel}>
-            Weight
+            {t("weight")}
           </Form.Label>
           <Col sm={multiControl}>
             <Form.Control
               id="weight"
               type="number"
-              min={0}
               value={weight}
               onChange={(e) => setWeight(Number(e.target.value))}
             />
@@ -75,21 +77,20 @@ export const TrainingForm = ({
               value={unit}
               onChange={(e) => setUnit(e.target.value)}
             >
-              <option value="kg">kg</option>
-              <option value="lb">lb</option>
+              <option value="kg">{t("kg")}</option>
+              <option value="lb">{t("lb")}</option>
             </Form.Select>
           </Col>
         </Form.Group>
 
         <Form.Group as={Row} className="mb-3">
           <Form.Label htmlFor="groups" column sm={singleLabel}>
-            Groups
+            {t("groups")}
           </Form.Label>
           <Col sm={singleControl}>
             <Form.Control
               id="groups"
               type="number"
-              min={1}
               value={groups}
               onChange={(e) => setGroups(Number(e.target.value))}
             />
@@ -98,13 +99,12 @@ export const TrainingForm = ({
 
         <Form.Group as={Row} className="mb-3">
           <Form.Label htmlFor="groups" column sm={singleLabel}>
-            Times
+            {t("times")}
           </Form.Label>
           <Col sm={singleControl}>
             <Form.Control
               id="groups"
               type="number"
-              min={1}
               value={times}
               onChange={(e) => setTimes(Number(e.target.value))}
             />
@@ -121,7 +121,7 @@ export const TrainingForm = ({
           onClick={addTraining}
           disabled={!date || !machine || !groups || !weight}
         >
-          Add Training
+          {t("addTraining")}
         </Button>
       )}
     </>

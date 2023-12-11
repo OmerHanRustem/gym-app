@@ -2,6 +2,8 @@ import React from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 
+import { useTranslation } from "react-i18next";
+
 export const EditModal = ({
   showModal,
   setShowModal,
@@ -11,6 +13,8 @@ export const EditModal = ({
   saveText = "Save Changes",
   children,
 }) => {
+  const { t, i18n } = useTranslation();
+
   const handleCloseModal = () => {
     setShowModal(false);
     setEditIndex(null);
@@ -24,10 +28,10 @@ export const EditModal = ({
       <Modal.Body>{children}</Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleCloseModal}>
-          {closeText}
+          {t("close")}
         </Button>
         <Button variant="primary" onClick={handleSave}>
-          {saveText}
+          {t("saveChanges")}
         </Button>
       </Modal.Footer>
     </Modal>

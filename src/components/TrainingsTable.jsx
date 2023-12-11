@@ -3,11 +3,15 @@ import { openDB } from "idb";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 
+import { useTranslation } from "react-i18next";
+
 export const TrainingsTable = ({
   trainings,
   editTrainingEntry,
   loadTrainings,
 }) => {
+  const { t, i18n } = useTranslation();
+
   const deleteTrainingEntry = async (date, index) => {
     const db = await openDB("gym-trainings", 1);
     const transaction = db.transaction("trainings", "readwrite");
@@ -32,21 +36,21 @@ export const TrainingsTable = ({
     loadTrainings(); // Refresh the displayed data after deletion
   };
   return (
-    <Table striped bordered hover>
+    <Table striped bordered hover style={{ tableLayout: "fixed" }}>
       <thead>
         <tr>
-          <th>Date</th>
-          <th>Machine</th>
-          <th>Weight</th>
-          <th>Groups</th>
-          <th>Times</th>
-          <th>Actions</th>
+          <th>{t("date")}</th>
+          <th>{t("machine")}</th>
+          <th>{t("weight")}</th>
+          <th>{t("groups")}</th>
+          <th>{t("times")}</th>
+          <th>{t("actions")}</th>
         </tr>
       </thead>
       <tbody>
         {trainings.map((training, rowIndex) => (
           <React.Fragment key={training.date}>
-            {training.trainings.map((t, index) => (
+            {training.trainings.map((ex, index) => (
               <tr key={`${training.date}-${index}`}>
                 {index === 0 && (
                   <td
@@ -59,16 +63,16 @@ export const TrainingsTable = ({
                       size="sm"
                       onClick={() => deleteTraining(training.date)}
                     >
-                      Delete
+                      {t("delete")}
                     </Button>
                   </td>
                 )}
-                <td>{t.machine}</td>
+                <td>{ex.machine}</td>
                 <td>
-                  {t.weight} {t.unit}
+                  {ex.weight} {t(ex.unit)}
                 </td>
-                <td>{t.groups}</td>
-                <td>{t.times}</td>
+                <td>{ex.groups}</td>
+                <td>{ex.times}</td>
                 <td>
                   <Button
                     variant="primary"
@@ -76,14 +80,14 @@ export const TrainingsTable = ({
                     className="me-1"
                     onClick={() => editTrainingEntry(training.date, index)}
                   >
-                    Edit
+                    {t("edit")}
                   </Button>
                   <Button
                     variant="danger"
                     size="sm"
                     onClick={() => deleteTrainingEntry(training.date, index)}
                   >
-                    Delete
+                    {t("delete")}
                   </Button>
                 </td>
               </tr>
