@@ -7,8 +7,8 @@ import Button from "react-bootstrap/Button";
 import { useTranslation } from "react-i18next";
 
 export const TrainingForm = ({
-  date,
-  setDate,
+  category,
+  setCategory,
   addForm = true,
   addTraining,
   machine,
@@ -31,15 +31,15 @@ export const TrainingForm = ({
       <Form>
         {addForm && (
           <Form.Group as={Row} className="mb-3">
-            <Form.Label htmlFor="date" column sm={singleLabel}>
-              {t("date")}
+            <Form.Label htmlFor="category" column sm={singleLabel}>
+              {t("category")}
             </Form.Label>
             <Col sm={singleControl}>
               <Form.Control
-                id="date"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
+                id="category"
+                type="text"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
               />
             </Col>
           </Form.Group>
@@ -116,10 +116,12 @@ export const TrainingForm = ({
         <Button
           className="mt-2 w-50"
           variant={
-            !date || !machine || !groups || !weight ? "secondary" : "primary"
+            !category || !machine || !groups || !weight
+              ? "secondary"
+              : "primary"
           }
           onClick={addTraining}
-          disabled={!date || !machine || !groups || !weight}
+          disabled={!category || !machine || !groups || !weight}
         >
           {t("addTraining")}
         </Button>

@@ -17,7 +17,7 @@ export const EditModal = ({
 
   const handleCloseModal = () => {
     setShowModal(false);
-    setEditIndex(null);
+    setEditIndex(-1);
   };
 
   return (

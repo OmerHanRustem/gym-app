@@ -10,6 +10,23 @@ export const ImportExport = () => {
   const { t, i18n } = useTranslation();
   const [importSection, setImportSection] = useState(false);
 
+  const loadTrainings = async () => {
+    const db = await openDB("gym-trainings", 1, {
+      upgrade(db) {
+        const store = db.createObjectStore("trainings", {
+          keyPath: "category",
+        });
+        store.createIndex("categoryIndex", "category");
+      },
+    });
+
+    const transaction = db.transaction("trainings", "readonly");
+    const store = transaction.objectStore("trainings");
+
+    const trainings = await store.getAll();
+    // setTrainings(trainings);
+  };
+
   const exportToCSV = async () => {
     const db = await openDB("gym-trainings", 1);
     const transaction = db.transaction("trainings", "readonly");
@@ -22,7 +39,7 @@ export const ImportExport = () => {
       .map((training) => {
         return training.trainings
           .map((t) => {
-            return `${training.date},${t.machine},${t.weight},${t.unit},${t.groups},${t.times}`;
+            return `${training.date},${t.machine},${t.weight},${t.unit},${t.groups},${t.times},${t.modDate}`;
           })
           .join("\n");
       })
@@ -58,19 +75,20 @@ export const ImportExport = () => {
       const dataMap = new Map();
 
       rows.forEach((row) => {
-        const [date, machine, weight, unit, groups, times] = row.split(",");
-        const training = { machine, weight, unit, groups, times }; // Include "times" in the training object
+        const [category, machine, weight, unit, groups, times, modDate] =
+          row.split(",");
+        const training = { machine, weight, unit, groups, times, modDate }; // Include "times" in the training object
 
-        if (!dataMap.has(date)) {
-          dataMap.set(date, [training]);
+        if (!dataMap.has(category)) {
+          dataMap.set(category, [training]);
         } else {
-          dataMap.get(date).push(training);
+          dataMap.get(category).push(training);
         }
       });
 
       // Save data to IndexedDB
-      dataMap.forEach(async (trainings, date) => {
-        const existingTraining = await store.get(date);
+      dataMap.forEach(async (trainings, category) => {
+        const existingTraining = await store.get(category);
 
         if (existingTraining) {
           // Update existing training
@@ -81,7 +99,7 @@ export const ImportExport = () => {
           await store.put(existingTraining);
         } else {
           // Add a new training object under the same date
-          const newTraining = { date, trainings };
+          const newTraining = { category, trainings };
           await store.put(newTraining);
         }
       });

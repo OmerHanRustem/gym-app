@@ -18,13 +18,6 @@ const Home = () => {
   const todayDate = new Date().toISOString().split("T")[0];
   const [date, setDate] = useState(todayDate);
 
-  // Add form state
-  const [machine, setMachine] = useState("");
-  const [groups, setGroups] = useState(1);
-  const [times, setTimes] = useState(1);
-  const [weight, setWeight] = useState(1);
-  const [unit, setUnit] = useState("kg");
-
   // Modal form state
   const [modalMachine, setModalMachine] = useState("");
   const [modalGroups, setModalGroups] = useState(1);
@@ -33,15 +26,17 @@ const Home = () => {
   const [modalUnit, setModalUnit] = useState("kg");
 
   const [showModal, setShowModal] = useState(false);
-  const [editIndex, setEditIndex] = useState(null);
+  const [editIndex, setEditIndex] = useState(-1);
 
   const viewMode = useSelector((state) => state.UI.viewMode);
 
   const loadTrainings = async () => {
     const db = await openDB("gym-trainings", 1, {
       upgrade(db) {
-        const store = db.createObjectStore("trainings", { keyPath: "date" });
-        store.createIndex("dateIndex", "date");
+        const store = db.createObjectStore("trainings", {
+          keyPath: "category",
+        });
+        store.createIndex("categoryIndex", "category");
       },
     });
 
@@ -62,9 +57,8 @@ const Home = () => {
     setEditIndex(index);
 
     // Set the modal form state with the values of the selected training
-    const selectedTraining = trainings.find((t) => t.date === date)?.trainings[
-      index
-    ];
+    const selectedTraining = trainings.find((t) => t.category === date)
+      ?.trainings[index];
     if (selectedTraining) {
       setModalMachine(selectedTraining.machine);
       setModalWeight(selectedTraining.weight);
@@ -114,7 +108,7 @@ const Home = () => {
         <h2 className="text-center mb-3">
           <img
             src="./icon-72x72.png"
-            alt="..."
+            alt="Logo"
             style={{ height: 30, width: 30 }}
             className="me-2"
           />

@@ -8,6 +8,17 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      workbox: {
+        // Use network first strategy for all requests
+        // This will attempt to fetch the latest response from the network,
+        // falling back to the cache if the network request fails.
+        runtimeCaching: [
+          {
+            urlPattern: new RegExp(".*"), // Match all requests
+            handler: "NetworkFirst",
+          },
+        ],
+      },
       manifest: {
         name: "Gym Training App",
         short_name: "Gym App",

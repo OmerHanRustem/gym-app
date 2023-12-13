@@ -11,22 +11,22 @@ export const TrainingsCards = ({
   editTrainingEntry,
   loadTrainings,
 }) => {
-  const [expandedDates, setExpandedDates] = useState([]);
+  const [expandedCategories, setExpandedCategories] = useState([]);
 
-  const toggleDateCard = (date) => {
-    if (expandedDates.includes(date)) {
-      setExpandedDates(expandedDates.filter((d) => d !== date));
+  const toggleDateCard = (category) => {
+    if (expandedCategories.includes(category)) {
+      setExpandedCategories(expandedCategories.filter((d) => d !== category));
     } else {
-      setExpandedDates([...expandedDates, date]);
+      setExpandedCategories([...expandedCategories, category]);
     }
   };
 
-  const deleteTrainingEntry = async (date, index) => {
+  const deleteTrainingEntry = async (category, index) => {
     const db = await openDB("gym-trainings", 1);
     const transaction = db.transaction("trainings", "readwrite");
     const store = transaction.objectStore("trainings");
 
-    const existingTraining = await store.get(date);
+    const existingTraining = await store.get(category);
 
     if (existingTraining) {
       existingTraining.trainings.splice(index, 1);
@@ -35,12 +35,12 @@ export const TrainingsCards = ({
     }
   };
 
-  const deleteTraining = async (date) => {
+  const deleteTraining = async (category) => {
     const db = await openDB("gym-trainings", 1);
     const transaction = db.transaction("trainings", "readwrite");
     const store = transaction.objectStore("trainings");
 
-    await store.delete(date);
+    await store.delete(category);
 
     loadTrainings();
   };
@@ -54,22 +54,22 @@ export const TrainingsCards = ({
             <Card.Title
               className="d-flex justify-content-center align-items-center gap-1"
               style={{ cursor: "pointer" }}
-              onClick={() => toggleDateCard(training.date)}
+              onClick={() => toggleDateCard(training.category)}
             >
-              <span>{training.date}</span>
+              <span>{training.category}</span>
               <Button
                 variant="danger"
                 size="sm"
-                onClick={() => deleteTraining(training.date)}
+                onClick={() => deleteTraining(training.category)}
               >
                 {t("delete")}
               </Button>
             </Card.Title>
           </Card.Header>
-          {expandedDates.includes(training.date) && (
+          {expandedCategories.includes(training.category) && (
             <Card.Body>
               {training.trainings.map((ex, index) => (
-                <Card key={`${training.date}-${index}`} className="mb-2">
+                <Card key={`${training.category}-${index}`} className="mb-2">
                   <Card.Header className="fw-bold">{ex.machine}</Card.Header>
                   <Card.Body>
                     {/* <Card.Text> */}
@@ -85,14 +85,14 @@ export const TrainingsCards = ({
                       variant="primary"
                       size="sm"
                       className="me-1"
-                      onClick={() => editTrainingEntry(training.date, index)}
+                      onClick={() => editTrainingEntry(training.category, index)}
                     >
                       {t("edit")}
                     </Button>
                     <Button
                       variant="danger"
                       size="sm"
-                      onClick={() => deleteTrainingEntry(training.date, index)}
+                      onClick={() => deleteTrainingEntry(training.category, index)}
                     >
                       {t("delete")}
                     </Button>

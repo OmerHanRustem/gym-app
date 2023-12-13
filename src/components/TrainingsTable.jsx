@@ -35,11 +35,12 @@ export const TrainingsTable = ({
 
     loadTrainings(); // Refresh the displayed data after deletion
   };
+
   return (
     <Table striped bordered hover style={{ tableLayout: "fixed" }}>
       <thead>
         <tr>
-          <th>{t("date")}</th>
+          <th>{t("category")}</th>
           <th>{t("machine")}</th>
           <th>{t("weight")}</th>
           <th>{t("groups")}</th>
@@ -49,19 +50,19 @@ export const TrainingsTable = ({
       </thead>
       <tbody>
         {trainings.map((training, rowIndex) => (
-          <React.Fragment key={training.date}>
+          <React.Fragment key={training.category}>
             {training.trainings.map((ex, index) => (
-              <tr key={`${training.date}-${index}`}>
+              <tr key={`${training.category}-${index}`}>
                 {index === 0 && (
                   <td
                     rowSpan={training.trainings.length}
                     className="text-center align-middle"
                   >
-                    {training.date}{" "}
+                    {training.category}
                     <Button
                       variant="danger"
                       size="sm"
-                      onClick={() => deleteTraining(training.date)}
+                      onClick={() => deleteTraining(training.category)}
                     >
                       {t("delete")}
                     </Button>
@@ -78,14 +79,14 @@ export const TrainingsTable = ({
                     variant="primary"
                     size="sm"
                     className="me-1"
-                    onClick={() => editTrainingEntry(training.date, index)}
+                    onClick={() => editTrainingEntry(training.category, index)}
                   >
                     {t("edit")}
                   </Button>
                   <Button
                     variant="danger"
                     size="sm"
-                    onClick={() => deleteTrainingEntry(training.date, index)}
+                    onClick={() => deleteTrainingEntry(training.category, index)}
                   >
                     {t("delete")}
                   </Button>

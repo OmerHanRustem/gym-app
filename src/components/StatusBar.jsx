@@ -16,7 +16,7 @@ function StatusBar() {
           <NavLink to="/gym-app/" className="nav-link">
             <img
               src="./icon-72x72.png"
-              alt="..."
+              alt="Logo"
               style={{ height: 30, width: 30 }}
               className="me-2"
             />

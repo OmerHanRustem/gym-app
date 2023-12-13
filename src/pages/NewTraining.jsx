@@ -4,9 +4,11 @@ import { TrainingForm } from "../components/TrainingForm";
 import { Col, Container, Row } from "react-bootstrap";
 
 function NewTraining() {
-  const todayDate = new Date().toISOString().split("T")[0];
-  const [date, setDate] = useState(todayDate);
+  // .toISOString().split("T")[0]
+  const todayDate = new Date();
+  const [modDate, setModDate] = useState(todayDate);
   // Add form state
+  const [category, setCategory] = useState("");
   const [machine, setMachine] = useState("");
   const [groups, setGroups] = useState(1);
   const [times, setTimes] = useState(1);
@@ -18,26 +20,33 @@ function NewTraining() {
     const transaction = db.transaction("trainings", "readwrite");
     const store = transaction.objectStore("trainings");
 
-    const existingTraining = await store.get(date);
+    const existingTraining = await store.get(category);
 
     if (existingTraining) {
       // Update existing training
-      existingTraining.trainings.push({ machine, weight, unit, groups, times });
+      existingTraining.trainings.push({
+        machine,
+        weight,
+        unit,
+        groups,
+        times,
+        modDate,
+      });
       await store.put(existingTraining);
     } else {
       // Add a new training object under the same date
       const newTraining = {
-        date,
-        trainings: [{ machine, weight, unit, groups, times }],
+        category,
+        trainings: [{ machine, weight, unit, groups, times, modDate }],
       };
       await store.put(newTraining);
     }
 
     // loadTrainings();
-    setDate(todayDate);
+    setCategory("");
     setMachine("");
-    setGroups(0);
-    setWeight(0);
+    setGroups(1);
+    setWeight(1);
     setUnit("kg");
   };
   return (
@@ -46,8 +55,8 @@ function NewTraining() {
         <Col>
           <TrainingForm
             addTraining={addTraining}
-            date={date}
-            setDate={setDate}
+            category={category}
+            setCategory={setCategory}
             machine={machine}
             setMachine={setMachine}
             groups={groups}
