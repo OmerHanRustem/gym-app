@@ -115,28 +115,31 @@ const Home = () => {
           {t("bunyan")} - {t("gymTrainings")}
         </h2>
 
-        {viewMode === "table" ? (
+        {/* {viewMode === "table" ? (
           <TrainingsTable
             trainings={trainings}
             loadTraining={loadTrainings}
             editTrainingEntry={editTrainingEntry}
           />
-        ) : (
-          <TrainingsCards
-            trainings={trainings}
-            loadTraining={loadTrainings}
-            editTrainingEntry={editTrainingEntry}
-          />
-        )}
+        ) : ( */}
+        <TrainingsCards
+          trainings={trainings}
+          loadTraining={loadTrainings}
+          editTrainingEntry={editTrainingEntry}
+        />
+        {/* )} */}
       </Row>
 
       <EditModal
         showModal={showModal}
         setShowModal={setShowModal}
+        setEditIndex={setEditIndex}
         handleSave={handleSaveEdit}
         header={t("editTraining")}
       >
         <TrainingForm
+          trainings={trainings}
+          setTrainings={setTrainings}
           date={date}
           setDate={setDate}
           addForm={false}

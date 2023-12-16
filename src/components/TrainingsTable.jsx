@@ -37,7 +37,7 @@ export const TrainingsTable = ({
   };
 
   return (
-    <Table striped bordered hover style={{ tableLayout: "fixed" }}>
+    <Table striped bordered hover style={{ tableLayout: "fixed" }} className="mb-5">
       <thead>
         <tr>
           <th>{t("category")}</th>
@@ -86,7 +86,9 @@ export const TrainingsTable = ({
                   <Button
                     variant="danger"
                     size="sm"
-                    onClick={() => deleteTrainingEntry(training.category, index)}
+                    onClick={() =>
+                      deleteTrainingEntry(training.category, index)
+                    }
                   >
                     {t("delete")}
                   </Button>

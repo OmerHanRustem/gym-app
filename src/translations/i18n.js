@@ -12,7 +12,7 @@ i18n.use(initReactI18next).init({
         machine: "الوصف",
         weight: "الوزن",
         groups: "المجموعات",
-        times: "المرات",
+        times: "عدات",
         actions: "الإجراءات",
         addTraining: "أضف تمرينا",
         kg: "كغ",
@@ -27,6 +27,8 @@ i18n.use(initReactI18next).init({
         changeLang: "اللغة",
         newTraining: "تمرين جديد",
         category: "الفئة",
+        split: "النظام",
+        set: "المجموعة",
       },
     },
     en: {
@@ -53,6 +55,8 @@ i18n.use(initReactI18next).init({
         changeLang: "Language",
         newTraining: "New Training",
         category: "Category",
+        split: "Split",
+        set: "Set"
       },
     },
   },

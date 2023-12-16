@@ -8,10 +8,11 @@ function NewTraining() {
   const todayDate = new Date();
   const [modDate, setModDate] = useState(todayDate);
   // Add form state
+  const [split, setSplit] = useState("");
   const [category, setCategory] = useState("");
   const [machine, setMachine] = useState("");
   const [groups, setGroups] = useState(1);
-  const [times, setTimes] = useState(1);
+  const [times, setTimes] = useState([]);
   const [weight, setWeight] = useState(1);
   const [unit, setUnit] = useState("kg");
 
@@ -34,8 +35,9 @@ function NewTraining() {
       });
       await store.put(existingTraining);
     } else {
-      // Add a new training object under the same date
+      // Add a new training object under the same category
       const newTraining = {
+        split,
         category,
         trainings: [{ machine, weight, unit, groups, times, modDate }],
       };
@@ -43,6 +45,7 @@ function NewTraining() {
     }
 
     // loadTrainings();
+    setSplit("");
     setCategory("");
     setMachine("");
     setGroups(1);
@@ -50,25 +53,25 @@ function NewTraining() {
     setUnit("kg");
   };
   return (
-    <Container fluid>
-      <Row className="justify-content-center align-items-center">
-        <Col>
-          <TrainingForm
-            addTraining={addTraining}
-            category={category}
-            setCategory={setCategory}
-            machine={machine}
-            setMachine={setMachine}
-            groups={groups}
-            setGroups={setGroups}
-            times={times}
-            setTimes={setTimes}
-            weight={weight}
-            setWeight={setWeight}
-            unit={unit}
-            setUnit={setUnit}
-          />
-        </Col>
+    <Container>
+      <Row className="justify-content-center align-items-center m-5">
+        <TrainingForm
+          addTraining={addTraining}
+          split={split}
+          setSplit={setSplit}
+          category={category}
+          setCategory={setCategory}
+          machine={machine}
+          setMachine={setMachine}
+          groups={groups}
+          setGroups={setGroups}
+          times={times}
+          setTimes={setTimes}
+          weight={weight}
+          setWeight={setWeight}
+          unit={unit}
+          setUnit={setUnit}
+        />
       </Row>
     </Container>
   );

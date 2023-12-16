@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 export const EditModal = ({
   showModal,
   setShowModal,
+  setEditIndex,
   handleSave,
   header = "Edit",
   closeText = "Close",
