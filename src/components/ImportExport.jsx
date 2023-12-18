@@ -39,7 +39,7 @@ export const ImportExport = () => {
       .map((training) => {
         return training.trainings
           .map((t) => {
-            return `${training.date},${t.machine},${t.weight},${t.unit},${t.groups},${t.times},${t.modDate}`;
+            return `${training.split},${training.category},${t.machine},${t.weight},${t.unit},${t.groups},${t.times},${t.modDate}`;
           })
           .join("\n");
       })
@@ -75,12 +75,12 @@ export const ImportExport = () => {
       const dataMap = new Map();
 
       rows.forEach((row) => {
-        const [category, machine, weight, unit, groups, times, modDate] =
+        const [split, category, machine, weight, unit, groups, times, modDate] =
           row.split(",");
         const training = { machine, weight, unit, groups, times, modDate }; // Include "times" in the training object
 
         if (!dataMap.has(category)) {
-          dataMap.set(category, [training]);
+          dataMap.set(split, category, [training]);
         } else {
           dataMap.get(category).push(training);
         }
@@ -107,6 +107,7 @@ export const ImportExport = () => {
       loadTrainings(); // Refresh the displayed data after import
     }
   };
+
   return (
     <>
       <Row className="justify-content-center align-items-center">

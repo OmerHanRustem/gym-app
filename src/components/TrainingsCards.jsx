@@ -3,6 +3,7 @@ import { openDB } from "idb";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
+import Modal from "react-bootstrap/Modal";
 
 import { useTranslation } from "react-i18next";
 
@@ -11,6 +12,8 @@ export const TrainingsCards = ({
   editTrainingEntry,
   loadTrainings,
 }) => {
+  const { t, i18n } = useTranslation();
+
   const [expandedCategories, setExpandedCategories] = useState([]);
 
   const toggleDateCard = (category) => {
@@ -55,84 +58,157 @@ export const TrainingsCards = ({
     return result;
   }, {});
 
-  const { t, i18n } = useTranslation();
+  const [deleteCategoryModal, setDeleteCategoryModal] = useState(false);
+  const [deletedCategory, setDeletedCategory] = useState("");
+  const [deleteExerciseModal, setDeleteExerciseModal] = useState(false);
+  const [deletedExercise, setDeletedExercise] = useState([]);
   return (
-    <Row className="justify-content-center align-items-start mb-5">
-      {Object.entries(groupedTrainings).map(([split, trainings]) => (
-        <Card key={split} className="mb-2 p-0">
-          <Card.Header className="h4">{split}</Card.Header>
-          <Card.Body>
-            {trainings.map((training, rowIndex) => (
-              <Card key={training.category} className="mb-2 p-0">
-                <Card.Header>
-                  <Card.Title
-                    className="d-flex justify-content-evenly align-items-center gap-1"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => toggleDateCard(training.category)}
-                  >
-                    <span>{training.category}</span>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => deleteTraining(training.category)}
+    <>
+      <Row className="justify-content-center align-items-start mb-5">
+        {Object.entries(groupedTrainings).map(([split, trainings]) => (
+          <Card key={split} className="mb-2 p-0">
+            <Card.Header className="h4">{split}</Card.Header>
+            <Card.Body>
+              {trainings.map((training, rowIndex) => (
+                <Card key={training.category} className="mb-2 p-0">
+                  <Card.Header>
+                    <Card.Title
+                      className="d-flex justify-content-evenly align-items-center gap-1"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => toggleDateCard(training.category)}
                     >
-                      {t("delete")}
-                    </Button>
-                  </Card.Title>
-                </Card.Header>
-                {expandedCategories.includes(training.category) && (
-                  <Card.Body>
-                    {training.trainings.map((ex, index) => (
-                      <Card
-                        key={`${training.category}-${index}`}
-                        className="mb-2"
+                      <span>{training.category}</span>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => {
+                          setDeletedCategory(training.category);
+                          setDeleteCategoryModal(true);
+                        }}
                       >
-                        <Card.Header className="fw-bold">
-                          {ex.machine}
-                        </Card.Header>
-                        <Card.Body>
-                          {t("weight")}: {ex.weight} {t(ex.unit)}
-                          <br />
-                          {t("groups")}: {ex.groups}
-                          <br />
-                          {ex.times.map((time, index) => (
-                            <ul key={index} className="m-0 ps-4">
-                              <li>
-                                Set {index + 1} Reps: {time}
-                              </li>
-                            </ul>
-                          ))}
-                        </Card.Body>
-                        <Card.Footer>
-                          <Button
-                            variant="primary"
-                            size="sm"
-                            className="me-1"
-                            onClick={() =>
-                              editTrainingEntry(training.category, index)
-                            }
-                          >
-                            {t("edit")}
-                          </Button>
-                          <Button
-                            variant="danger"
-                            size="sm"
-                            onClick={() =>
-                              deleteTrainingEntry(training.category, index)
-                            }
-                          >
-                            {t("delete")}
-                          </Button>
-                        </Card.Footer>
-                      </Card>
-                    ))}
-                  </Card.Body>
-                )}
-              </Card>
-            ))}
-          </Card.Body>
-        </Card>
-      ))}
-    </Row>
+                        {t("delete")}
+                      </Button>
+                    </Card.Title>
+                  </Card.Header>
+                  {expandedCategories.includes(training.category) && (
+                    <Card.Body>
+                      {training.trainings.map((ex, index) => (
+                        <Card
+                          key={`${training.category}-${index}`}
+                          className="mb-2"
+                        >
+                          <Card.Header className="fw-bold">
+                            {ex.machine}
+                          </Card.Header>
+                          <Card.Body>
+                            {t("weight")}: {ex.weight} {t(ex.unit)}
+                            <br />
+                            {t("groups")}: {ex.groups}
+                            <br />
+                            {ex.times.map((time, index) => (
+                              <ul key={index} className="m-0 ps-4">
+                                <li>
+                                  Set {index + 1} Reps: {time}
+                                </li>
+                              </ul>
+                            ))}
+                          </Card.Body>
+                          <Card.Footer className="text-muted text-end">
+                            {t("lastModificationDate")}:{" "}
+                            {ex.modDate.toISOString().slice(0, 10)}
+                          </Card.Footer>
+                          <Card.Footer>
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              className="me-1"
+                              onClick={() =>
+                                editTrainingEntry(training.category, index)
+                              }
+                            >
+                              {t("edit")}
+                            </Button>
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={() => {
+                                setDeletedExercise([training.category, index]);
+                                setDeleteExerciseModal(true);
+                              }}
+                            >
+                              {t("delete")}
+                            </Button>
+                          </Card.Footer>
+                        </Card>
+                      ))}
+                    </Card.Body>
+                  )}
+                </Card>
+              ))}
+            </Card.Body>
+          </Card>
+        ))}
+      </Row>
+
+      <Modal
+        show={deleteCategoryModal}
+        onHide={() => setDeleteCategoryModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Category</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure that you want to DELETE {deletedCategory}?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setDeleteCategoryModal(false)}
+          >
+            {t("close")}
+          </Button>
+          <Button
+            variant="danger"
+            onClick={() => {
+              setDeleteCategoryModal(false);
+              deleteTraining(deletedCategory);
+            }}
+          >
+            {t("delete")}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal
+        show={deleteExerciseModal}
+        onHide={() => setDeleteExerciseModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Exercise</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure that you want to DELETE this Exercise?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setDeleteExerciseModal(false)}
+          >
+            {t("close")}
+          </Button>
+          <Button
+            variant="danger"
+            onClick={() => {
+              deleteTrainingEntry(deletedExercise[0], deletedExercise[1]);
+              setDeleteExerciseModal(false);
+            }}
+          >
+            {t("delete")}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
   );
 };

@@ -29,6 +29,7 @@ i18n.use(initReactI18next).init({
         category: "الفئة",
         split: "النظام",
         set: "المجموعة",
+        lastModificationDate: "آخر تعديل",
       },
     },
     en: {
@@ -56,7 +57,8 @@ i18n.use(initReactI18next).init({
         newTraining: "New Training",
         category: "Category",
         split: "Split",
-        set: "Set"
+        set: "Set",
+        lastModificationDate: "Last Modified",
       },
     },
   },

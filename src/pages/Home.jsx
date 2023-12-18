@@ -129,7 +129,6 @@ const Home = () => {
         />
         {/* )} */}
       </Row>
-
       <EditModal
         showModal={showModal}
         setShowModal={setShowModal}

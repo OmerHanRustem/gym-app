@@ -4,6 +4,9 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRotateLeft } from "@fortawesome/free-solid-svg-icons";
+
 import { useTranslation } from "react-i18next";
 import { Container } from "react-bootstrap";
 import { openDB } from "idb";
@@ -118,8 +121,11 @@ export const TrainingForm = ({
                         onChange={(e) => setSplit(e.target.value)}
                       />
                     </Col>
-                    <Col sm={1} onClick={() => setCustomSplit(false)}>
-                      <Button variant="secondary">X</Button>
+                    <Col sm={1}>
+                      <FontAwesomeIcon
+                        icon={faRotateLeft}
+                        onClick={() => setCustomSplit(false)}
+                      />
                     </Col>
                   </>
                 )}
@@ -166,8 +172,11 @@ export const TrainingForm = ({
                         onChange={(e) => setCategory(e.target.value)}
                       />
                     </Col>
-                    <Col sm={1} onClick={() => setCustomCategory(false)}>
-                      <Button variant="secondary">X</Button>
+                    <Col sm={1}>
+                      <FontAwesomeIcon
+                        icon={faRotateLeft}
+                        onClick={() => setCustomCategory(false)}
+                      />
                     </Col>
                   </>
                 )}
