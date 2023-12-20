@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { openDB } from "idb";
+import { loadTrainings } from "../rtk/slices/ui-slice";
+import { useSelector, useDispatch } from "react-redux";
 
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
@@ -7,18 +9,20 @@ import { EditModal } from "../components/Modal";
 import { TrainingForm } from "../components/TrainingForm";
 import { TrainingsTable } from "../components/TrainingsTable";
 import { TrainingsCards } from "../components/TrainingsCards";
-import { useSelector } from "react-redux";
 
 import { useTranslation } from "react-i18next";
 
 const Home = () => {
   const { t, i18n } = useTranslation();
+  const dispatch = useDispatch();
+  const trainings = useSelector((state) => state.UI.trainings);
 
-  const [trainings, setTrainings] = useState([]);
+  // const [trainings, setTrainings] = useState([]);
   const todayDate = new Date().toISOString().split("T")[0];
   const [date, setDate] = useState(todayDate);
 
   // Modal form state
+  const [modalCategory, setModalCategory] = useState("");
   const [modalMachine, setModalMachine] = useState("");
   const [modalGroups, setModalGroups] = useState(1);
   const [modalTimes, setModalTimes] = useState(1);
@@ -30,34 +34,18 @@ const Home = () => {
 
   const viewMode = useSelector((state) => state.UI.viewMode);
 
-  const loadTrainings = async () => {
-    const db = await openDB("gym-trainings", 1, {
-      upgrade(db) {
-        const store = db.createObjectStore("trainings", {
-          keyPath: "category",
-        });
-        store.createIndex("categoryIndex", "category");
-      },
-    });
-
-    const transaction = db.transaction("trainings", "readonly");
-    const store = transaction.objectStore("trainings");
-
-    const trainings = await store.getAll();
-    setTrainings(trainings);
-  };
-
   useEffect(() => {
-    loadTrainings();
+    dispatch(loadTrainings());
   }, []);
+  useEffect(() => console.log(trainings), [trainings]);
 
-  const editTrainingEntry = (date, index) => {
+  const editTrainingEntry = (category, index) => {
     // Set the main form state with the values of the selected training
-    setDate(date);
+    setModalCategory(category);
     setEditIndex(index);
 
     // Set the modal form state with the values of the selected training
-    const selectedTraining = trainings.find((t) => t.category === date)
+    const selectedTraining = trainings.find((t) => t.category === category)
       ?.trainings[index];
     if (selectedTraining) {
       setModalMachine(selectedTraining.machine);
@@ -81,7 +69,7 @@ const Home = () => {
     const transaction = db.transaction("trainings", "readwrite");
     const store = transaction.objectStore("trainings");
 
-    const existingTraining = await store.get(date);
+    const existingTraining = await store.get(modalCategory);
 
     if (existingTraining) {
       // Update the training at the editIndex with the new values from the modal form
@@ -91,6 +79,7 @@ const Home = () => {
         unit: modalUnit,
         groups: modalGroups,
         times: modalTimes,
+        modDate: new Date().toISOString(),
       };
 
       // Put the updated training back into the store
@@ -98,7 +87,7 @@ const Home = () => {
 
       // Close the modal and refresh the displayed data
       handleCloseModal();
-      loadTrainings();
+      dispatch(loadTrainings());
     }
   };
 
@@ -138,7 +127,7 @@ const Home = () => {
       >
         <TrainingForm
           trainings={trainings}
-          setTrainings={setTrainings}
+          // setTrainings={setTrainings}
           date={date}
           setDate={setDate}
           addForm={false}

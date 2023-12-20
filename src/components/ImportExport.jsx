@@ -6,26 +6,13 @@ import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import { useTranslation } from "react-i18next";
 
+import { useDispatch } from "react-redux";
+import { loadTrainings } from "../rtk/slices/ui-slice";
+
 export const ImportExport = () => {
   const { t, i18n } = useTranslation();
+  const dispatch = useDispatch();
   const [importSection, setImportSection] = useState(false);
-
-  const loadTrainings = async () => {
-    const db = await openDB("gym-trainings", 1, {
-      upgrade(db) {
-        const store = db.createObjectStore("trainings", {
-          keyPath: "category",
-        });
-        store.createIndex("categoryIndex", "category");
-      },
-    });
-
-    const transaction = db.transaction("trainings", "readonly");
-    const store = transaction.objectStore("trainings");
-
-    const trainings = await store.getAll();
-    // setTrainings(trainings);
-  };
 
   const exportToCSV = async () => {
     const db = await openDB("gym-trainings", 1);
@@ -39,7 +26,9 @@ export const ImportExport = () => {
       .map((training) => {
         return training.trainings
           .map((t) => {
-            return `${training.split},${training.category},${t.machine},${t.weight},${t.unit},${t.groups},${t.times},${t.modDate}`;
+            return `${training.split},${training.category},${t.machine},${
+              t.weight
+            },${t.unit},${t.groups},${t.times.join("&")},${t.modDate}`;
           })
           .join("\n");
       })
@@ -77,34 +66,49 @@ export const ImportExport = () => {
       rows.forEach((row) => {
         const [split, category, machine, weight, unit, groups, times, modDate] =
           row.split(",");
-        const training = { machine, weight, unit, groups, times, modDate }; // Include "times" in the training object
+
+        const training = {
+          machine,
+          weight,
+          unit,
+          groups,
+          times: times.split("&"),
+          modDate,
+        };
 
         if (!dataMap.has(category)) {
-          dataMap.set(split, category, [training]);
+          // Category doesn't exist, set split property
+          dataMap.set(category, {
+            split: split || "",
+            category,
+            trainings: [training],
+          });
         } else {
-          dataMap.get(category).push(training);
+          // Category exists, check if split property is missing and set it
+          const existingCategory = dataMap.get(category);
+          if (!existingCategory.split) {
+            existingCategory.split = split || "";
+          }
+          existingCategory.trainings.push(training);
         }
       });
 
       // Save data to IndexedDB
-      dataMap.forEach(async (trainings, category) => {
+      dataMap.forEach(async (trainingData, category) => {
         const existingTraining = await store.get(category);
 
         if (existingTraining) {
-          // Update existing training
-          existingTraining.trainings = [
-            ...existingTraining.trainings,
-            ...trainings,
-          ];
+          // Update existing category
+          existingTraining.trainings.push(...trainingData.trainings);
           await store.put(existingTraining);
         } else {
-          // Add a new training object under the same date
-          const newTraining = { category, trainings };
+          // Add a new category object
+          const newTraining = trainingData;
           await store.put(newTraining);
         }
       });
 
-      loadTrainings(); // Refresh the displayed data after import
+      dispatch(loadTrainings()); // Refresh the displayed data after import
     }
   };
 

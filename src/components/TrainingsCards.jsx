@@ -7,12 +7,12 @@ import Modal from "react-bootstrap/Modal";
 
 import { useTranslation } from "react-i18next";
 
-export const TrainingsCards = ({
-  trainings,
-  editTrainingEntry,
-  loadTrainings,
-}) => {
+import { useDispatch } from "react-redux";
+import { loadTrainings } from "../rtk/slices/ui-slice";
+
+export const TrainingsCards = ({ trainings, editTrainingEntry }) => {
   const { t, i18n } = useTranslation();
+  const dispatch = useDispatch();
 
   const [expandedCategories, setExpandedCategories] = useState([]);
 
@@ -34,7 +34,7 @@ export const TrainingsCards = ({
     if (existingTraining) {
       existingTraining.trainings.splice(index, 1);
       await store.put(existingTraining);
-      loadTrainings();
+      dispatch(loadTrainings());
     }
   };
 
@@ -45,7 +45,7 @@ export const TrainingsCards = ({
 
     await store.delete(category);
 
-    loadTrainings();
+    dispatch(loadTrainings());
   };
 
   // Group the training data by 'training.split' value
@@ -62,6 +62,23 @@ export const TrainingsCards = ({
   const [deletedCategory, setDeletedCategory] = useState("");
   const [deleteExerciseModal, setDeleteExerciseModal] = useState(false);
   const [deletedExercise, setDeletedExercise] = useState([]);
+
+  function formatDate(date) {
+    const ISODate = new Date(date);
+
+    const year = ISODate.getFullYear();
+    const month = (ISODate.getMonth() + 1).toString().padStart(2, "0");
+    const day = ISODate.getDate().toString().padStart(2, "0");
+    const hours = ISODate.getHours() % 12 || 12; // Use 12 for midnight
+    const paddedHours = hours.toString().padStart(2, "0");
+    const minutes = ISODate.getMinutes().toString().padStart(2, "0");
+    const ampm = ISODate.getHours() >= 12 ? t("PM") : t("AM");
+
+    return `${year}-${month}-${day} ${t(
+      "timeAt"
+    )} ${paddedHours}:${minutes} ${ampm}`;
+  }
+
   return (
     <>
       <Row className="justify-content-center align-items-start mb-5">
@@ -108,14 +125,23 @@ export const TrainingsCards = ({
                             {ex.times.map((time, index) => (
                               <ul key={index} className="m-0 ps-4">
                                 <li>
-                                  Set {index + 1} Reps: {time}
+                                  {i18n.language === "en" ? (
+                                    <>
+                                      {t("set")} {index + 1} Reps: {time}
+                                    </>
+                                  ) : (
+                                    <>
+                                      {t("times")} {t("set")} [ {index + 1} ] :{" "}
+                                      {time}
+                                    </>
+                                  )}
                                 </li>
                               </ul>
                             ))}
                           </Card.Body>
                           <Card.Footer className="text-muted text-end">
                             {t("lastModificationDate")}:{" "}
-                            {ex.modDate.toISOString().slice(0, 10)}
+                            {formatDate(ex.modDate)}
                           </Card.Footer>
                           <Card.Footer>
                             <Button

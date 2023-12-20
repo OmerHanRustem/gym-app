@@ -5,7 +5,7 @@ import { Col, Container, Row } from "react-bootstrap";
 
 function NewTraining() {
   // .toISOString().split("T")[0]
-  const todayDate = new Date();
+  const todayDate = new Date().toISOString();
   const [modDate, setModDate] = useState(todayDate);
   // Add form state
   const [split, setSplit] = useState("");
