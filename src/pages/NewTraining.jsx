@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { openDB } from "idb";
 import { TrainingForm } from "../components/TrainingForm";
 import { Col, Container, Row } from "react-bootstrap";
+import { useParams } from "react-router-dom";
 
 function NewTraining() {
+  const { id } = useParams();
   // .toISOString().split("T")[0]
   const todayDate = new Date().toISOString();
   const [modDate, setModDate] = useState(todayDate);
@@ -52,9 +54,11 @@ function NewTraining() {
     setWeight(1);
     setUnit("kg");
   };
+
   return (
     <Container>
       <Row className="justify-content-center align-items-center m-5">
+        <h1>{id}</h1>
         <TrainingForm
           addTraining={addTraining}
           split={split}
