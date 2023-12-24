@@ -116,6 +116,7 @@ function Category() {
       // Close the modal and refresh the displayed data
       setShowModal(false);
       setEditIndex(null);
+
       dispatch(loadTrainings());
     }
   };
@@ -138,47 +139,48 @@ function Category() {
 
   return (
     <Container>
-      <Row className="justify-content-center align-items-start m-3 p-5">
+      <Row className="justify-content-center align-items-start m-3 pb-5">
         {Object.entries(groupedTrainings).map(([split, trainings]) =>
           trainings
             .filter((training) => training.category === id)
             .map((training) => (
-              <Card
-                key={training.category}
-                className="mb-2 p-0"
-                style={{ width: "24rem" }}
-              >
-                <Card.Header>
-                  <Card.Title className="d-flex justify-content-evenly align-items-center gap-1">
-                    <Link
-                      to="/gym-app/"
-                      style={{ textDecoration: "none", color: "#000" }}
-                    >
-                      {i18n.language === "en" ? (
-                        <FontAwesomeIcon icon={faArrowLeft} />
-                      ) : (
-                        <FontAwesomeIcon icon={faArrowRight} />
-                      )}
-                    </Link>
-                    <span>{training.category}</span>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => {
-                        setDeletedCategory(training.category);
-                        setDeleteCategoryModal(true);
-                      }}
-                    >
-                      {t("delete")}
-                    </Button>
-                  </Card.Title>
-                </Card.Header>
+              <>
+                <Card key={training.category} className="p-0 mb-2">
+                  <Card.Header>
+                    <Card.Title className="d-flex justify-content-evenly align-items-center gap-1">
+                      <Link
+                        to="/gym-app/"
+                        style={{ textDecoration: "none", color: "#000" }}
+                      >
+                        {i18n.language === "en" ? (
+                          <FontAwesomeIcon icon={faArrowLeft} />
+                        ) : (
+                          <FontAwesomeIcon icon={faArrowRight} />
+                        )}
+                      </Link>
+                      <span style={{ fontSize: 24 }}>
+                        {t(training.category)}
+                      </span>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => {
+                          setDeletedCategory(training.category);
+                          setDeleteCategoryModal(true);
+                        }}
+                      >
+                        {t("delete")}
+                      </Button>
+                    </Card.Title>
+                  </Card.Header>
+                </Card>
 
-                <Card.Body>
+                <Row className="justify-content-center">
                   {training.trainings.map((ex, index) => (
                     <Card
                       key={`${training.category}-${index}`}
-                      className="mb-2"
+                      className="p-0 m-1 mb-2"
+                      style={{ width: "20rem" }}
                     >
                       <Card.Header className="fw-bold">
                         {ex.machine}
@@ -205,7 +207,10 @@ function Category() {
                           </ul>
                         ))}
                       </Card.Body>
-                      <Card.Footer className="text-muted text-end">
+                      <Card.Footer
+                        className="text-muted text-end"
+                        style={{ fontSize: "smaller" }}
+                      >
                         {t("lastModificationDate")}: {formatDate(ex.modDate)}
                       </Card.Footer>
                       <Card.Footer>
@@ -232,8 +237,8 @@ function Category() {
                       </Card.Footer>
                     </Card>
                   ))}
-                </Card.Body>
-              </Card>
+                </Row>
+              </>
             ))
         )}
       </Row>

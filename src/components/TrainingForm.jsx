@@ -98,14 +98,14 @@ export const TrainingForm = ({
                       }}
                     >
                       <option value="" disabled>
-                        Select a split
+                        {t("Select a split")}
                       </option>
                       {getSplitOptions().map((splitOption, index) => (
                         <option key={index} value={splitOption}>
-                          {splitOption}
+                          {t(splitOption)}
                         </option>
                       ))}
-                      <option value="custom">Custom</option>
+                      <option value="custom">{t("custom")}</option>
                     </Form.Select>
                   </Col>
                 )}
@@ -116,7 +116,7 @@ export const TrainingForm = ({
                       <Form.Control
                         id="customSplit"
                         type="text"
-                        placeholder="Enter custom split"
+                        placeholder={t("Enter custom split")}
                         value={split}
                         onChange={(e) => setSplit(e.target.value)}
                       />
@@ -149,14 +149,14 @@ export const TrainingForm = ({
                       }}
                     >
                       <option value="" disabled>
-                        Select a category
+                        {t("Select a category")}
                       </option>
                       {getCategoryOptions().map((CategoryOption, index) => (
                         <option key={index} value={CategoryOption}>
-                          {CategoryOption}
+                          {t(CategoryOption)}
                         </option>
                       ))}
-                      <option value="custom">Custom</option>
+                      <option value="custom">{t("custom")}</option>
                     </Form.Select>
                   </Col>
                 )}
@@ -167,7 +167,7 @@ export const TrainingForm = ({
                       <Form.Control
                         id="customCategory"
                         type="text"
-                        placeholder="Enter custom category"
+                        placeholder={t("Enter custom category")}
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                       />

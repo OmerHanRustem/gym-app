@@ -50,26 +50,25 @@ export const TrainingsCards = () => {
     <>
       <Row className="justify-content-center align-items-start mb-5">
         {Object.entries(groupedTrainings).map(([split, trainings]) => (
-          <Card key={split} className="mb-2 p-0" style={{ width: "18rem" }}>
-            <Card.Header className="h4">{split}</Card.Header>
+          <Card key={split} className="m-1 p-0" style={{ width: "18rem" }}>
+            <Card.Header className="h4">{t(split)}</Card.Header>
             <Card.Body>
               {trainings.map((training, rowIndex) => (
-                <Card key={training.category} className="mb-2 p-0">
-                  <Card.Header>
-                    <NavLink
-                      style={{ textDecoration: "none", color: "#000" }}
-                      // to={`/gym-app/${cleanLink(split)}/${training.category}`}
-                      to={`/gym-app/${training.category}`}
-                    >
+                <NavLink
+                  to={`/gym-app/${training.category}`}
+                  style={{ textDecoration: "none", color: "#000" }}
+                >
+                  <Card key={training.category} className="mb-2 p-0">
+                    <Card.Header>
                       <Card.Title
                         className="d-flex justify-content-evenly align-items-center gap-1"
                         style={{ cursor: "pointer" }}
                       >
-                        <span>{training.category}</span>
+                        <span>{t(training.category)}</span>
                       </Card.Title>
-                    </NavLink>
-                  </Card.Header>
-                </Card>
+                    </Card.Header>
+                  </Card>
+                </NavLink>
               ))}
             </Card.Body>
           </Card>
