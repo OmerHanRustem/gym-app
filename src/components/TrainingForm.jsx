@@ -74,6 +74,14 @@ export const TrainingForm = ({
     return uniqueCategories;
   };
 
+  const validWeight = (val, index) => {
+    if (Array.isArray(val)) {
+      return val[index - 1];
+    } else {
+      return val;
+    }
+  };
+
   return (
     <>
       <Container>
@@ -81,11 +89,11 @@ export const TrainingForm = ({
           {addForm && (
             <>
               <Form.Group as={Row} className="mb-3">
-                <Form.Label htmlFor="split" column sm={singleLabel}>
+                <Form.Label htmlFor="split" column sm={singleLabel} xs={3}>
                   {t("split")}
                 </Form.Label>
                 {!customSplit && (
-                  <Col sm={singleControl}>
+                  <Col sm={singleControl} xs={9}>
                     <Form.Select
                       id="split"
                       value={split}
@@ -112,7 +120,7 @@ export const TrainingForm = ({
 
                 {customSplit && (
                   <>
-                    <Col sm={3}>
+                    <Col sm={3} xs={8}>
                       <Form.Control
                         id="customSplit"
                         type="text"
@@ -121,7 +129,7 @@ export const TrainingForm = ({
                         onChange={(e) => setSplit(e.target.value)}
                       />
                     </Col>
-                    <Col sm={1}>
+                    <Col sm={1} xs={2}>
                       <FontAwesomeIcon
                         icon={faRotateLeft}
                         onClick={() => setCustomSplit(false)}
@@ -132,11 +140,11 @@ export const TrainingForm = ({
               </Form.Group>
 
               <Form.Group as={Row} className="mb-3">
-                <Form.Label htmlFor="category" column sm={singleLabel}>
+                <Form.Label htmlFor="category" column sm={singleLabel} xs={3}>
                   {t("category")}
                 </Form.Label>
                 {!customCategory && (
-                  <Col sm={singleControl}>
+                  <Col sm={singleControl} xs={9}>
                     <Form.Select
                       id="category"
                       value={category}
@@ -163,7 +171,7 @@ export const TrainingForm = ({
 
                 {customCategory && (
                   <>
-                    <Col sm={3}>
+                    <Col sm={3} xs={7}>
                       <Form.Control
                         id="customCategory"
                         type="text"
@@ -172,7 +180,7 @@ export const TrainingForm = ({
                         onChange={(e) => setCategory(e.target.value)}
                       />
                     </Col>
-                    <Col sm={1}>
+                    <Col sm={1} xs={2}>
                       <FontAwesomeIcon
                         icon={faRotateLeft}
                         onClick={() => setCustomCategory(false)}
@@ -185,10 +193,10 @@ export const TrainingForm = ({
           )}
 
           <Form.Group as={Row} className="mb-3">
-            <Form.Label htmlFor="machine" column sm={singleLabel}>
+            <Form.Label htmlFor="machine" column sm={singleLabel} xs={3}>
               {t("machine")}
             </Form.Label>
-            <Col sm={singleControl}>
+            <Col sm={singleControl} xs={9}>
               <Form.Control
                 id="machine"
                 type="text"
@@ -199,19 +207,10 @@ export const TrainingForm = ({
           </Form.Group>
 
           <Form.Group as={Row} className="mb-3">
-            <Form.Label htmlFor="weight" column sm={singleLabel}>
+            <Form.Label htmlFor="weight" column sm={singleLabel} xs={3}>
               {t("weight")}
             </Form.Label>
-            <Col sm={multiControl}>
-              <Form.Control
-                id="weight"
-                type="text"
-                pattern="[0-9]*"
-                value={weight}
-                onChange={(e) => setWeight(Number(e.target.value))}
-              />
-            </Col>
-            <Col sm={multiControl}>
+            <Col sm={singleControl} xs={9}>
               <Form.Select
                 id="unit"
                 value={unit}
@@ -224,15 +223,15 @@ export const TrainingForm = ({
           </Form.Group>
 
           <Form.Group as={Row} className="mb-3">
-            <Form.Label htmlFor="groups" column sm={singleLabel}>
+            <Form.Label htmlFor="groups" column sm={singleLabel} xs={3}>
               {t("groups")}
             </Form.Label>
-            <Col sm={singleControl}>
+            <Col sm={singleControl} xs={9}>
               <Form.Control
                 id="groups"
-                type="text"
+                type="number"
                 pattern="[0-9]*"
-                value={groups}
+                value={groups || null}
                 onChange={(e) => setGroups(Number(e.target.value))}
               />
             </Col>
@@ -241,17 +240,17 @@ export const TrainingForm = ({
           {Array.from({ length: groups }, (_, index) => index + 1).map(
             (set) => (
               <Form.Group as={Row} className="mb-3" key={set}>
-                <Form.Label htmlFor={`groups-${set}`} column sm={singleLabel}>
+                <Form.Label htmlFor={`groups-${set}`} column sm={singleLabel} xs={3}>
                   {i18n.language === "ar"
                     ? `${t("times")} ${t("set")} ${set}`
-                    : `${t("set")} ${set} ${t("times")}`}
+                    : `${t("times")} ${set}`}
                 </Form.Label>
-                <Col sm={singleControl}>
+                <Col sm={3} xs={4}>
                   <Form.Control
                     id={`groups-${set}`}
-                    type="text"
+                    type="number"
                     pattern="[0-9]*"
-                    value={times[set - 1] || 0}
+                    value={times[set - 1] || null}
                     onChange={(e) => {
                       const newTimes = [...times];
                       newTimes[set - 1] = Number(e.target.value);
@@ -259,6 +258,22 @@ export const TrainingForm = ({
                     }}
                   />
                 </Col>
+                <Col sm={3} xs={4}>
+                  <Form.Control
+                    id={`weight-${set}`}
+                    type="number"
+                    pattern="[0-9]*"
+                    value={validWeight(weight, set) || null}
+                    onChange={(e) => {
+                      const newWeights = [...weight];
+                      newWeights[set - 1] = Number(e.target.value);
+                      setWeight(newWeights.slice(0, groups)); // Adjust array size
+                    }}
+                  />
+                </Col>
+                <Form.Label column sm={3} xs={1}>
+                  {t(unit)}
+                </Form.Label>
               </Form.Group>
             )
           )}

@@ -46,27 +46,14 @@ function Category() {
 
   const [deleteExerciseModal, setDeleteExerciseModal] = useState(false);
   const [deletedExercise, setDeletedExercise] = useState([]);
-  const deleteTrainingEntry = async (category, index) => {
-    const db = await openDB("gym-trainings", 1);
-    const transaction = db.transaction("trainings", "readwrite");
-    const store = transaction.objectStore("trainings");
-
-    const existingTraining = await store.get(category);
-
-    if (existingTraining) {
-      existingTraining.trainings.splice(index, 1);
-      await store.put(existingTraining);
-      dispatch(loadTrainings());
-    }
-  };
 
   const todayDate = new Date().toISOString().split("T")[0];
   const [date, setDate] = useState(todayDate);
   const [modalCategory, setModalCategory] = useState("");
   const [modalMachine, setModalMachine] = useState("");
-  const [modalGroups, setModalGroups] = useState(1);
-  const [modalTimes, setModalTimes] = useState(1);
-  const [modalWeight, setModalWeight] = useState(0);
+  const [modalGroups, setModalGroups] = useState("");
+  const [modalTimes, setModalTimes] = useState([]);
+  const [modalWeight, setModalWeight] = useState([]);
   const [modalUnit, setModalUnit] = useState("kg");
 
   const [showModal, setShowModal] = useState(false);
@@ -137,6 +124,14 @@ function Category() {
     )} ${paddedHours}:${minutes} ${ampm}`;
   }
 
+  const validWeight = (val, index) => {
+    if (Array.isArray(val)) {
+      return val[index];
+    } else {
+      return val;
+    }
+  };
+
   return (
     <Container>
       <Row className="justify-content-center align-items-start m-3 pb-5">
@@ -186,8 +181,6 @@ function Category() {
                         {ex.machine}
                       </Card.Header>
                       <Card.Body>
-                        {t("weight")}: {ex.weight} {t(ex.unit)}
-                        <br />
                         {t("groups")}: {ex.groups}
                         <br />
                         {ex.times.map((time, index) => (
@@ -195,7 +188,8 @@ function Category() {
                             <li>
                               {i18n.language === "en" ? (
                                 <>
-                                  {t("set")} {index + 1} Reps: {time}
+                                  Reps {index + 1} ➡ {time} ×{" "}
+                                  {validWeight(ex.weight, index)} {ex.unit}
                                 </>
                               ) : (
                                 <>

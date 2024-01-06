@@ -13,9 +13,9 @@ function NewTraining() {
   const [split, setSplit] = useState("");
   const [category, setCategory] = useState("");
   const [machine, setMachine] = useState("");
-  const [groups, setGroups] = useState(1);
+  const [groups, setGroups] = useState("");
   const [times, setTimes] = useState([]);
-  const [weight, setWeight] = useState(1);
+  const [weight, setWeight] = useState([]);
   const [unit, setUnit] = useState("kg");
 
   const addTraining = async () => {
@@ -57,7 +57,7 @@ function NewTraining() {
 
   return (
     <Container>
-      <Row className="justify-content-center align-items-center m-5">
+      <Row className="justify-content-center align-items-center m-2">
         <h1>{id}</h1>
         <TrainingForm
           addTraining={addTraining}
